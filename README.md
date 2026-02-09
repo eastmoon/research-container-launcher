@@ -43,3 +43,85 @@
 #### 參數前處理、後處理
 
 經由指令解析，區分 ```--key=value``` 的目標參數與數值，並於前、後處理函數應對相關作業系統的檔案、目錄操作。
+
+常見如：
+
++ 前處理 ```--clean```，移除緩存內容
++ 後處理 ```--output=[TARGET_DIR]```，複製緩存內容到指定位置
+
+## 測試
+
+本研究測試以下啟動操作：
+
++ 若不存在目標映像檔 ( hello-world )，則應下載
++ 若設定選項 ```--clean``` 則移除快取目錄
++ 執行目標映像檔，並產生一個時間記錄存放於快取目錄
++ 若設定選項 ```--output``` 則將快取內容複製到目標目錄
+
+### 測試環境
+
+本研究主要開發環境為 Window 作業系統，使用 [ConEmu](https://conemu.github.io/) 啟動指令列執行。
+
++ batch
+
+使用 [ConEmu](https://conemu.github.io/) 添加一個 ```shells:cmd```，並前往 ```src``` 目錄內執行
+
++ powershell
+
+使用 [ConEmu](https://conemu.github.io/) 添加一個 ```shells:powershell```，並前往 ```src``` 目錄內執行
+
++ shell
+
+使用 [ConEmu](https://conemu.github.io/) 添加一個 ```Bash:bash```，並前往 ```src``` 目錄內執行
+
++ zsh
+
+使用擁有 Zsh 的 Docker 映像檔為開發與測試環境，其句型如下：
+
+```
+docker build -t docker:zsh %cd%\conf\docker\zsh
+docker run -ti --rm ^
+  -v "//var/run/docker.sock:/var/run/docker.sock" ^
+  -v %cd%\src:/app ^
+  -w /app ^
+  docker:zsh
+```
+
+### 測試項目
+
++ 移除映像檔並重新載入
+```
+docker rmi hello-world
+# Batch
+launcher
+# Powershell
+.\launcher.ps1
+# Shell
+./launcher.sh
+# Zsh
+zsh ./launcher.sh
+```
+
++ 移除快取目錄，確保移除舊的時間記錄檔案，僅有最新的檔案
+```
+# Batch
+launcher --clean
+# Powershell
+.\launcher.ps1 -Clean
+# Shell
+./launcher.sh --clean
+# Zsh
+zsh ./launcher.sh --clean
+```
+
++ 複製快取目錄至目標目錄，確保所有紀錄皆外移
+```
+# Batch
+launcher --output=.\tmp
+# Powershell
+.\launcher.ps1 -Output=.\tmp
+# Shell
+./launcher.sh --output=.\tmp
+# Zsh
+zsh ./launcher.sh --output=.\tmp
+```
